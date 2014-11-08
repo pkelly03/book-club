@@ -1,5 +1,7 @@
 package ben.fp.chapter6
 
+import ben.fp.chapter6.Machine.MachineState
+
 trait RNG {
   def nextInt: (Int, RNG)
 }
@@ -7,6 +9,7 @@ trait RNG {
 object RNG {
 
   type Rand[+A] = RNG => (A, RNG)
+
 
   case class SimpleRNG(seed: Long) extends RNG {
     def nextInt: (Int, RNG) = {
@@ -29,18 +32,18 @@ object RNG {
     (i / (Int.MaxValue.toDouble + 1), r)
   }
 
-  def intDouble(rng: RNG): ((Int,Double), RNG) = {
-    val (int, gen ) = rng.nextInt
+  def intDouble(rng: RNG): ((Int, Double), RNG) = {
+    val (int, gen) = rng.nextInt
     val (dub, gen2) = double(rng)
     (int -> dub) -> gen2
   }
-  
-  def doubleInt(rng: RNG): ((Double,Int), RNG) = {
-    val ((i , d), g) = intDouble(rng)
-    (d -> i ) -> g
+
+  def doubleInt(rng: RNG): ((Double, Int), RNG) = {
+    val ((i, d), g) = intDouble(rng)
+    (d -> i) -> g
   }
 
-  def double3(rng: RNG): ((Double,Double,Double), RNG) = {
+  def double3(rng: RNG): ((Double, Double, Double), RNG) = {
     val (dub1, gen1) = double(rng)
     val (dub2, gen2) = double(gen1)
     val (dub3, gen3) = double(gen2)
@@ -51,22 +54,119 @@ object RNG {
     (1 to count).foldLeft(List.empty[Int] -> rng) {
       case ((intList, rg), i) =>
         val (int, gen) = nonNegativeInt(rg)
-        (int +: intList , gen)
+        (int +: intList, gen)
     }
   }
 
-  def unit[A](a: A): Rand[A] = (rng:RNG) => (a, rng)
+  def unit[A](a: A): Rand[A] = (rng: RNG) => (a, rng)
 
-  def double2(rng: RNG): (Double, RNG) = map(nonNegativeInt)( _ / Int.MaxValue.toDouble)(rng)
+  def double2(rng: RNG): (Double, RNG) = map(nonNegativeInt)(_ / Int.MaxValue.toDouble)(rng)
 
-  def map[A,B](s: Rand[A])(f: A => B): Rand[B] = rng => {
+  def map[A, B](s: Rand[A])(f: A => B): Rand[B] = rng => {
     val (a, rng2) = s(rng)
     (f(a), rng2)
   }
 
-  def map2[A,B,C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] = someRngWillGoHereLater =>{
-     val (a, rng1) = ra(someRngWillGoHereLater)
-     val (b, rng2) = rb(rng1)
-    (f(a,b), rng2)
+  def map2[A, B, C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] = rng => {
+    val (a, rng1) = ra(rng)
+    val (b, rng2) = rb(rng1)
+    (f(a, b), rng2)
+  }
+
+  def sequence[A](fs: List[Rand[A]]): Rand[List[A]] = fs.foldRight(unit(List.empty[A]))((a, b) => map2(a, b)(_ :: _))
+
+
+  def mapv2[A, B](randA: Rand[A])(f: A => B): Rand[B] = flatMap(randA)(a => rng => (f(a), rng))
+
+  def map2v2[A, B, C](randA: Rand[A], randB: Rand[B])(f: (A, B) => C): Rand[C] = flatMap(randA) {
+    a => flatMap(randB) {
+      b => rng => (f(a, b), rng)
+    }
+  }
+
+  def flatMap[A, B](f: Rand[A])(g: A => Rand[B]): Rand[B] = rng => {
+    val (a, rng2) = f(rng)
+    g(a)(rng2)
   }
 }
+
+object State {
+
+  def unit[S, A](a: A): State[S, A] = State(state => (a, state))
+
+  def map2[S, A, B, C](ra: State[S, A], rb: State[S, B])(f: (A, B) => C): State[S, C] =
+    ra.flatMap(a => rb.map(f(a, _)))
+
+  def sequence[S, A](ss: List[State[S, A]]): State[S, List[A]] = {
+    ss.foldRight(State.unit[S, List[A]](List.empty[A])) {
+      (state, states) => map2(state, states)(_ :: _)
+    }
+  }
+
+  def get[S]: State[S, S] = State(s => (s, s))
+
+  def set[S](s: S): State[S, Unit] = State(_ => ((), s))
+
+  def modify[S](f: S => S): State[S, Unit] = for {
+    s <- get
+    _ <- set(f(s))
+  } yield ()
+
+}
+
+case class State[S, +A](run: S => (A, S)) {
+
+  def map[B](f: A => B): State[S, B] =
+    flatMap(a => State.unit(f(a)))
+
+  def map2[B, C](s: State[S, B])(f: (A, B) => C): State[S, C] =
+    State.map2(this, s)(f)
+
+  def flatMap[B](f: A => State[S, B]): State[S, B] = State(
+    s => {
+      val (a, b) = run(s)
+      f(a).run(b)
+    }
+  )
+}
+
+
+object Machine {
+
+  type MachineState = State[Machine, (Int, Int)]
+  val EmptyMachineState = State.unit[Machine, (Int, Int)]((0, 0))
+
+  def insert(m: MachineState): MachineState = State(
+    m => {
+      val newMachine = m.copy(locked = false, coins = m.coins + 1)
+      ((newMachine.sweets, newMachine.coins), newMachine)
+    }
+  )
+
+  def dispense(m: MachineState): MachineState = State(
+    m => {
+      val newMachine = m.copy(locked = true, sweets = m.sweets -1)
+      ((newMachine.sweets, newMachine.coins), newMachine)
+    }
+  )
+
+  def input(m: MachineState, i: Input): MachineState = i match {
+    case Coin => insert(m)
+    case Turn => dispense(m)
+  }
+}
+
+sealed trait Input
+
+case object Coin extends Input
+
+case object Turn extends Input
+
+case class Machine(locked: Boolean, sweets: Int, coins: Int)
+
+case class MachineSimulation(sweets:Int, coins:Int) {
+
+  def simulateMachine(inputs: List[Input]): MachineState =
+    inputs.foldRight(Machine.EmptyMachineState)((i, s) => Machine.input(s, i))
+}
+
