@@ -1,7 +1,6 @@
 package ben.fp.chapter6
 
 
-import ben.fp.chapter6.Machine.MachineState
 import org.scalatest.{Matchers, WordSpec}
 
 
@@ -209,45 +208,74 @@ class Chapter6Spec extends WordSpec with Matchers {
 
   "6.11 Coin state machine"   should {
 
-    def simulator = MachineSimulation(coins = 0, sweets = 10)
+    def simulator = MachineSimulation(0, 10)
 
-    "Initial state has 10 sweets and no coins" in {
+    "A machine that’s out of candy ignores all inputs" in {
 
-      val machine: MachineState = simulator.simulateMachine(Nil)
+      val simulation: MachineSimulation = MachineSimulation(coins = 0, sweets = 0)
 
-      val ((coins, sweets), nextState) = machine.run(Machine(locked = true, 10,0))
+      simulation.simulateMachine(Coin)._1 shouldBe (0,0)
+
+      simulation.simulateMachine(Coin, Coin)._1 shouldBe (0,0)
+
+      simulation.simulateMachine(Coin, Turn)._1 shouldBe (0,0)
+
+      simulation.simulateMachine(Turn, Turn)._1 shouldBe (0,0)
+    }
+
+    "Initial state has 10 sweets and no coins and be locked" in {
+
+      val ((coins, sweets), machine) = simulator.simulateMachine()
 
       coins shouldBe 0
 
-      sweets shouldBe 0
+      sweets shouldBe 10
 
-      nextState shouldBe Machine(locked = true, 10,0)
+      machine.locked shouldBe true
     }
 
     "Inserting a coin into a locked machine will cause it to unlock if there are any sweets left" in {
 
-      val machine: MachineState = simulator.simulateMachine(List(Coin))
-
-      val ((sweets, coins), nextState) = machine.run(Machine(locked = true, 10,0))
+      val ((coins, sweets), machine) = simulator.simulateMachine(Coin)
 
       sweets shouldBe 10
 
       coins shouldBe 1
 
-      nextState.locked shouldBe false
+      machine.locked shouldBe false
     }
 
-    "Turning the knob on an unlocked machine will cause it to dispense candy and become lockeds left" in {
+    "Turning the knob on an unlocked machine will cause it to dispense candy and become locked" in {
 
-      val machine: MachineState = simulator.simulateMachine(List(Coin, Turn))
-
-      val ((sweets, coins), nextState) = machine.run(Machine(locked = true, 10,0))
+      val ((coins, sweets), machine) = simulator.simulateMachine(Coin, Turn)
 
       sweets shouldBe 9
 
       coins shouldBe 1
 
-      nextState.locked shouldBe true
+      machine.locked shouldBe true
+    }
+
+    "Turning the knob on a locked machine does nothing" in {
+
+      val ((coins, sweets), machine) = simulator.simulateMachine(Turn)
+
+      sweets shouldBe 10
+
+      coins shouldBe 0
+
+      machine.locked shouldBe true
+    }
+
+    "Inserting a coin into an unlocked machine does nothing" in {
+
+      val ((coins, sweets), machine) = simulator.simulateMachine(Coin,Coin)
+
+      sweets shouldBe 10
+
+      coins shouldBe 1
+
+      machine.locked shouldBe false
     }
   }
 }

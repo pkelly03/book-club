@@ -1,6 +1,6 @@
 package ben.fp.chapter6
 
-import ben.fp.chapter6.Machine.MachineState
+import ben.fp.chapter6.Machine.{Coins, Sweets, MachineState}
 
 trait RNG {
   def nextInt: (Int, RNG)
@@ -133,26 +133,24 @@ case class State[S, +A](run: S => (A, S)) {
 
 object Machine {
 
-  type MachineState = State[Machine, (Int, Int)]
-  val EmptyMachineState = State.unit[Machine, (Int, Int)]((0, 0))
-
-  def insert(m: MachineState): MachineState = State(
-    m => {
-      val newMachine = m.copy(locked = false, coins = m.coins + 1)
-      ((newMachine.sweets, newMachine.coins), newMachine)
-    }
-  )
-
-  def dispense(m: MachineState): MachineState = State(
-    m => {
-      val newMachine = m.copy(locked = true, sweets = m.sweets -1)
-      ((newMachine.sweets, newMachine.coins), newMachine)
-    }
-  )
+  type Coins = Int
+  type Sweets = Int
+  type MachineState = State[Machine, (Coins, Sweets)]
 
   def input(m: MachineState, i: Input): MachineState = i match {
-    case Coin => insert(m)
-    case Turn => dispense(m)
+    case Coin => m.flatMap{
+      case (coins, sweets) => State( machine =>
+        if (machine.sweets > 0 && machine.locked) (coins +1, sweets) -> machine.copy(locked=false)
+        else (coins, sweets) -> machine
+      )
+    }
+    case Turn => m.flatMap{
+      case (coins, sweets) => State( machine =>
+        if (machine.sweets > 0 && !machine.locked) (coins, sweets - 1) -> machine.copy(locked = true)
+        else (coins, sweets) -> machine
+
+      )
+    }
   }
 }
 
@@ -164,9 +162,17 @@ case object Turn extends Input
 
 case class Machine(locked: Boolean, sweets: Int, coins: Int)
 
-case class MachineSimulation(sweets:Int, coins:Int) {
+case class MachineSimulation(coins:Int, sweets:Int) {
 
-  def simulateMachine(inputs: List[Input]): MachineState =
-    inputs.foldRight(Machine.EmptyMachineState)((i, s) => Machine.input(s, i))
+  def simulateMachine(inputs: Input*): ((Coins, Sweets), Machine) = {
+
+    val initialState = State.unit[Machine, (Coins, Sweets)]((coins, sweets))
+    val start: Machine = Machine(true, sweets, coins)
+
+    inputs.toList match {
+      case Nil => initialState.run(start)
+      case _  => inputs.reverse.foldRight(initialState)((input, state) => Machine.input(state, input)).run(start)
+    }
+  }
 }
 
