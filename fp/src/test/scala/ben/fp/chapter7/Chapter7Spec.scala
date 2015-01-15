@@ -99,8 +99,59 @@ class Chapter7Spec extends WordSpec with Matchers {
     "innit" in {
       val a = lazyUnit(42 + 1)
       val S = Executors.newFixedThreadPool(2)
-      println(Par.equal(S)(a, fork(a)))
+      Par.equal(S)(a, fork(a))
+    }
+  }
 
+
+  "7.11 choice choice" should {
+
+    "choose false" in {
+      val es = Executors.newFixedThreadPool(2)
+      val future = choice(unit(false))(unit("true"), unit("false"))
+      future(es).get() shouldBe "false"
+    }
+
+    "choose true" in {
+      val es = Executors.newFixedThreadPool(2)
+      val future = choice(unit(true))(unit("true"), unit("false"))
+      future(es).get() shouldBe "true"
+    }
+  }
+
+  "7.11 choice choiceN" should {
+
+    val es = Executors.newFixedThreadPool(1)
+
+    "choose false" in {
+      val future = choice(unit(false))(unit("true"), unit("false"))
+      future(es).get() shouldBe "false"
+    }
+
+    "choose true" in {
+
+      val future = choice(unit(true))(unit("true"), unit("false"))
+      future(es).get() shouldBe "true"
+    }
+
+    val choices: List[Par[String]] = List(unit("first"), unit("second"), unit("third"))
+
+    "choose N first" in {
+
+      val future = choiceN(unit(0))(choices)
+      future(es).get() shouldBe "first"
+    }
+
+    "choose N second" in {
+
+      val future = choiceN(unit(1))(choices)
+      future(es).get() shouldBe "second"
+    }
+
+    "choose N third" in {
+
+      val future = choiceN(unit(2))(choices)
+      future(es).get() shouldBe "third"
     }
   }
 }

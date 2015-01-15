@@ -28,6 +28,16 @@ object Par {
   def map[A, B](a: Par[A])(f: A => B): Par[B] =
     (es: ExecutorService) => UnitFuture(f(a(es).get))
 
+  def choice[A](cond: Par[Boolean])(t: Par[A], f: Par[A]): Par[A] =
+    (es: ExecutorService) => {
+      choiceN(map2(unit(), cond)((a, b) => if (b) 0 else 1))(List(t, f))(es)
+    }
+
+  def choiceN[A](n: Par[Int])(choices: List[Par[A]]): Par[A] =
+    (es: ExecutorService) => {
+      map(n) { i => choices(i)(es)}(es).get
+    }
+
   def map2[A, B, C](a: Par[A], b: Par[B])(f: (A, B) => C): Par[C] =
     (es: ExecutorService) => {
       val af = a(es)
@@ -38,8 +48,7 @@ object Par {
   def map2WithTimeout[A, B, C](a: TimedPar[A], b: TimedPar[B], timeout: Long, units: TimeUnit)(f: (A, B) => C): Par[C] =
     (es: ExecutorService) => {
       val (elapsed, af) = a(es).getWithTimeout(timeout, units)
-      val timeout1: Long = timeout - elapsed
-      val (e2, bf) = b(es).getWithTimeout(timeout1, units)
+      val (e2, bf) = b(es).getWithTimeout(timeout - elapsed, units)
       UnitFuture(f(af, bf))
     }
 
@@ -58,6 +67,7 @@ object Par {
 
   def parMap[A, B](ps: List[A])(f: A => B): Par[List[B]] =
     sequence(ps.map(asyncF(f)))
+
 
   def parFilter[A](as: List[A])(f: A => Boolean): Par[List[A]] = {
 
@@ -88,7 +98,7 @@ object Par {
 
     private val ref: AtomicReference[Option[A]] = new AtomicReference(None)
 
-    private def value  = ref.get()
+    private def value = ref.get()
 
     private def getValue: Option[A] = ref.get
 
@@ -109,10 +119,11 @@ object Par {
 
     override def get: A = setValue(a.get(5, TimeUnit.SECONDS))
 
-    def getWithTimeout(timeout: Long, units: TimeUnit): (Long, A) = timed(timeout, units)( get(timeout, units) )
+    def getWithTimeout(timeout: Long, units: TimeUnit): (Long, A) = timed(timeout, units)(get(timeout, units))
 
     override def cancel(mayInterruptIfRunning: Boolean): Boolean = a.cancel(mayInterruptIfRunning)
 
     override def isCancelled: Boolean = a.isCancelled
   }
+
 }
