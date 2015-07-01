@@ -52,5 +52,4 @@ class Chapter12Test extends FunSpec with Matchers {
     }
   }
 
-
 }
