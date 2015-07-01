@@ -18,8 +18,10 @@ class Chapter12Test extends FunSpec with Matchers {
   }
 
   describe("exercise2_largest_element_in_array_reduceLeft") {
-    it("should find the largest element in an array with reduceLeft")
-    exercise2_largest_element_in_array_reduceLeft(Array(2,4,6,1)) should be 6
+    it("should find the largest element in an array with reduceLeft") {
+      exercise2_largest_element_in_array_reduceLeft(Array(2, 4, 6, 1)) should be(6)
+      exercise2_largest_element_in_array_reduceLeft(Array(20, 4, 6, 1)) should be(20)
+    }
   }
 
   describe("exercise3_implement_factorial_function_using_to_and_reduceLeft_without_loop_or_recursion") {
