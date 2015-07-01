@@ -26,7 +26,10 @@ class Chapter12Test extends FunSpec with Matchers {
 
   describe("exercise3_implement_factorial_function_using_to_and_reduceLeft_without_loop_or_recursion") {
     it("should ...") {
-      exercise3_implement_factorial_function_using_to_and_reduceLeft_without_loop_or_recursion
+      // exercise3_factorial(4) should be 24 ( 4 x 3 x 2 x 1 )
+      // so exercise3_factorial(4) should be 120 (5 x 4 x 3 x 2 x 1)
+      exercise3_factorial(4) should be (24)
+      exercise3_factorial(5) should be (120)
     }
   }
 }

@@ -8,5 +8,7 @@ object Chapter12 {
   def exercise2_largest_element_in_array_reduceLeft(arr: Array[Int]): Int =
     arr.reduceLeft(_ max _)
 
-  def exercise3_implement_factorial_function_using_to_and_reduceLeft_without_loop_or_recursion(): Int = ???
+  def exercise3_factorial(num: Int): Int =
+    List.tabulate(num)(n => n + 1).reverse.reduceLeft(_ * _)
+
 }
