@@ -5,7 +5,7 @@ import paul.impatient.exercises.Chapter12._
 
 class Chapter12Test extends FunSpec with Matchers {
 
-  describe("exercise 1") {
+  describe("exercise1_values") {
     /*
       Write a function values(fun: (Int) => Int, low: Int, high: Int) that yields a collection of '
       function inputs and outputs in a given range. For example, values(x => x * x, -5, 5) should produce
@@ -15,5 +15,10 @@ class Chapter12Test extends FunSpec with Matchers {
       exercise1_values((x:Int) => x + x, -2, 2) should be(List((-2, -4), (-1, -2), (0,0), (1,2), (2,4)))
       exercise1_values((x:Int) => x * x, -2, 2) should be(List((-2,4), (-1,1), (0,0), (1,1), (2,4)))
     }
+  }
+
+  describe("exercise2_largest_element_in_array_reduceLeft") {
+    it("should find the largest element in an array with reduceLeft")
+    exercise2_largest_element_in_array_reduceLeft(Array(2,4,6,1)) should be 6
   }
 }
