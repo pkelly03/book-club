@@ -41,7 +41,16 @@ class Chapter12Test extends FunSpec with Matchers {
 
   describe("exercise6_largestAt_yields_largest_index_within_sequence_of_inputs") {
     it("should return the index where the largest value is") {
-      exercise5_largestAt(x => 10 * x, 1 to 10) should be (10)
+      exercise6_largestAt(x => 10 * x, 1 to 10) should be (10)
     }
   }
+
+  describe("exercise7_function_on_pairs") {
+    it("should perform a function on a set of pairs") {
+      val pairs = (1 to 10) zip (11 to 20)
+      exercise7_function_on_pairs() should be (10)
+    }
+  }
+
+
 }

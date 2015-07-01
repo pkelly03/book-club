@@ -12,9 +12,11 @@ object Chapter12 {
     List.tabulate(num)(n => n + 1).reverse.reduceLeft(_ * _)
 
   def exercise5_largest(f: (Int) => Int, range: Range): Int =
-    range.reduceLeft((a,b)=> a max f(b))
+    range.reduceLeft((a, b) => a max f(b))
 
   def exercise6_largestAt(f: (Int) => Int, range: Range): Int =
-    range.reduceLeft((a,b)=>  if (f(a) > f(b)) a else b)
+    range.reduceLeft((a, b) => if (f(a) > f(b)) a else b)
+
+  def exercise7_function_on_pairs(): Int = ???
 
 }
