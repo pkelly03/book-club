@@ -34,8 +34,14 @@ class Chapter12Test extends FunSpec with Matchers {
   }
 
   describe("exercise5_largest_yields_largest_value_of_function_within_sequence_of_inputs") {
-    it("should ...") {
+    it("should return the largest sequence in a range without using loops or recursion") {
       exercise5_largest(x => 10 * x, 1 to 10) should be (100)
+    }
+  }
+
+  describe("exercise6_largestAt_yields_largest_index_within_sequence_of_inputs") {
+    it("should return the index where the largest value is") {
+      exercise5_largestAt(x => 10 * x, 1 to 10) should be (10)
     }
   }
 }
