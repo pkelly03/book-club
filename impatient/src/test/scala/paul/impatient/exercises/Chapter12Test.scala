@@ -35,9 +35,7 @@ class Chapter12Test extends FunSpec with Matchers {
 
   describe("exercise5_largest_yields_largest_value_of_function_within_sequence_of_inputs") {
     it("should ...") {
-      // exercise3_factorial(4) should be 24 ( 4 x 3 x 2 x 1 )
-      // so exercise3_factorial(4) should be 120 (5 x 4 x 3 x 2 x 1)
-      exercise5_largest(x => 10 * x, 1 to 10) should be (24)
+      exercise5_largest(x => 10 * x, 1 to 10) should be (100)
     }
   }
 }

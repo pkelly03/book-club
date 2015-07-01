@@ -11,4 +11,6 @@ object Chapter12 {
   def exercise3_factorial(num: Int): Int =
     List.tabulate(num)(n => n + 1).reverse.reduceLeft(_ * _)
 
+  def exercise5_largest(f: (Int) => Int, range: Range): Int =
+    range.toList.reduceLeft((a,b)=> a max f(b))
 }
