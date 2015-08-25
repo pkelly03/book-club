@@ -34,9 +34,13 @@ object Par {
     }
 
   def choiceN[A](n: Par[Int])(choices: List[Par[A]]): Par[A] =
-    (es: ExecutorService) => chooser(n)(choices)(es)
+    (es: ExecutorService) => flatMap(n)(choices)(es)
 
-  def chooser[A,B](pa: Par[A])(choices: A => Par[B]): Par[B] = (es: ExecutorService) => {
+
+  def join[A](a: Par[Par[A]]): Par[A] = flatMap(a)( b => b )
+
+
+  def flatMap[A,B](pa: Par[A])(choices: A => Par[B]): Par[B] = (es: ExecutorService) => {
     map(pa) { i => choices(i)(es)}(es).get
   }
 

@@ -1,6 +1,6 @@
 package ben.fp.chapter6
 
-import ben.fp.chapter6.Machine.{Coins, Sweets, MachineState}
+import ben.fp.chapter6.Machine.{Coins, Sweets}
 
 trait RNG {
   def nextInt: (Int, RNG)

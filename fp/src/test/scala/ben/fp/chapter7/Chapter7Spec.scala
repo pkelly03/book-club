@@ -157,18 +157,27 @@ class Chapter7Spec extends WordSpec with Matchers {
     val mapChoices: String => Par[String] = Map("f" -> unit("first"), "s" -> unit("second"), "t" -> unit("third"))
 
     "choiceMap first" in {
-      val future = chooser[String, String](unit("f"))(mapChoices)
+      val future = flatMap[String, String](unit("f"))(mapChoices)
       future(es).get() shouldBe "first"
     }
 
     "choiceMap second" in {
-      val future = chooser[String, String](unit("s"))(mapChoices)
+      val future = flatMap[String, String](unit("s"))(mapChoices)
       future(es).get() shouldBe "second"
     }
 
     "choiceMap third" in {
-      val future = chooser[String, String](unit("t"))(mapChoices)
+      val future = flatMap[String, String](unit("t"))(mapChoices)
       future(es).get() shouldBe "third"
+    }
+  }
+
+  "7.14 join" should {
+
+    val es = Executors.newFixedThreadPool(1)
+
+    "join" in {
+      join(unit(unit("foo")))(es) shouldBe unit("foo")(es)
     }
   }
 }
