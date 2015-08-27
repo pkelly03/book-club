@@ -29,6 +29,10 @@ class Chapter1Spec extends FunSpec with Matchers {
         Chapter1.Paul.exercise1_usingFoldLeftWithImmutableSet("zxcvbnmasdfghjklqwertyuiop") shouldBe true
         Chapter1.Paul.exercise1_usingFoldLeftWithImmutableSet("zxcvbnmzxcvbnm") shouldBe false
 
+        Chapter1.Paul.exercise1_usingFoldLeftWithOneImmutableSet("aaa") shouldBe false
+        Chapter1.Paul.exercise1_usingFoldLeftWithOneImmutableSet("zxcvbnmasdfghjklqwertyuiop") shouldBe true
+        Chapter1.Paul.exercise1_usingFoldLeftWithOneImmutableSet("zxcvbnmzxcvbnm") shouldBe false
+
       }
     }
   }

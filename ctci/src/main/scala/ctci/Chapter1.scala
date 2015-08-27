@@ -13,10 +13,15 @@ object Chapter1 extends App {
       }.isEmpty
 
     def exercise1_usingFoldLeftWithImmutableSet(input: String): Boolean =
-      input.foldLeft((Set.empty[Char], Set.empty[Char])) { case ((inputSet, duplicates), currentChar) =>
-        if (inputSet(currentChar)) (inputSet, duplicates + currentChar)
-        else (inputSet + currentChar, duplicates)
+      input.foldLeft((Set.empty[Char], Set.empty[Char])) { case ((inputSet, duplicateSet), currentChar) =>
+        if (inputSet(currentChar)) (inputSet, duplicateSet + currentChar)
+        else (inputSet + currentChar, duplicateSet)
       }._2.isEmpty
+
+    def exercise1_usingFoldLeftWithOneImmutableSet(input: String): Boolean =
+      input.foldLeft((Set.empty[Char])) { case (inputSet, currentChar) =>
+        inputSet + currentChar
+      }.size == input.length
 
     def exercise1_usingTailRecursion(input: String): Boolean = ???
   }
