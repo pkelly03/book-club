@@ -1,6 +1,25 @@
 package ctci
 
-object Chapter1 {
+object Chapter1 extends App {
+
+  object Paul {
+
+    def exercise1_usingDistinct(input: String): Boolean =
+      input.toList.distinct == input.toList
+
+    def exercise1_usingCollect(input: String): Boolean =
+      input.toList.groupBy(identity).collect {
+        case (x,ys) if ys.size > 1 => x
+      }.isEmpty
+
+    def exercise1_usingFoldLeftWithImmutableSet(input: String): Boolean =
+      input.foldLeft((Set.empty[Char], Set.empty[Char])) { case ((inputSet, duplicates), currentChar) =>
+        if (inputSet(currentChar)) (inputSet, duplicates + currentChar)
+        else (inputSet + currentChar, duplicates)
+      }._2.isEmpty
+
+    def exercise1_usingTailRecursion(input: String): Boolean = ???
+  }
 
   object Ben {
     def exercise1_1(input: String): Boolean = {
