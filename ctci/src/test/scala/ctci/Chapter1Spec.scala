@@ -11,6 +11,10 @@ class Chapter1Spec extends FunSpec with Matchers {
         Chapter1.Ben.exercise1_1("aaa") shouldBe false
         Chapter1.Ben.exercise1_1("zxcvbnmasdfghjklqwertyuiop") shouldBe true
         Chapter1.Ben.exercise1_1("zxcvbnmzxcvbnm") shouldBe false
+
+
+        Chapter1.Ben.exercise1_1b("aaa") shouldBe false
+        Chapter1.Ben.exercise1_1b("zxcvbnmzxcvbnm") shouldBe false
       }
     }
   }
