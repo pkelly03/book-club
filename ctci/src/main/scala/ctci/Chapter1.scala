@@ -1,5 +1,7 @@
 package ctci
 
+import scala.annotation.tailrec
+
 object Chapter1 extends App {
 
   object Paul {
@@ -27,7 +29,8 @@ object Chapter1 extends App {
   }
 
   object Ben {
-    def exercise1_1(input: String): Boolean = {
+
+    def exercise1_foldLeft(input: String): Boolean = {
 
       input.exists { el =>
         val charCounter = input.foldLeft[Option[(Char, Int)]](None)((acc, currentElement) =>
@@ -38,11 +41,24 @@ object Chapter1 extends App {
       }
     }
 
-    def exercise1_1b(input: String): Boolean = {
+    def exercise1_groupByAndCollect(input: String): Boolean = {
+      input.groupBy(identity).collect {case (p,grouped) if grouped.length > 1 => p}.isEmpty
+    }
 
-      input.groupBy(identity).collect {
-        case (p,grouped) if grouped.length > 1 => p
-      }.isEmpty
+    def exercise1_recursive(input: String): Boolean = {
+
+      def duplicated(el:Char, input:List[Char]): Boolean = input match {
+        case Nil => false
+        case x :: tail => el.equals(x) || duplicated(el, tail)
+      }
+
+      @tailrec
+      def traverse[T](els:List[T])(f: (T, List[T]) => Boolean) : Boolean = els match {
+        case Nil => false
+        case x :: xs =>  f(x, xs) || traverse(xs)(f)
+      }
+
+      !traverse(input toList)(duplicated)
     }
   }
 }

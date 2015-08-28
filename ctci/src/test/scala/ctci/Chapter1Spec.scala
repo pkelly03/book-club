@@ -10,12 +10,15 @@ class Chapter1Spec extends FunSpec with Matchers {
     describe("exercise 1") {
       it ("Implement an algorithm to determine if a string has all unique characters What if you can not use additional data structures?") {
 
-        Chapter1.Ben.exercise1_1("aaa") shouldBe false
-        Chapter1.Ben.exercise1_1("zxcvbnmasdfghjklqwertyuiop") shouldBe true
-        Chapter1.Ben.exercise1_1("zxcvbnmzxcvbnm") shouldBe false
+        Chapter1.Ben.exercise1_foldLeft("aaa") shouldBe false
+        Chapter1.Ben.exercise1_foldLeft("zxcvbnmasdfghjklqwertyuiop") shouldBe true
+        Chapter1.Ben.exercise1_foldLeft("zxcvbnmzxcvbnm") shouldBe false
 
-        Chapter1.Ben.exercise1_1b("aaa") shouldBe false
-        Chapter1.Ben.exercise1_1b("zxcvbnmzxcvbnm") shouldBe false
+        Chapter1.Ben.exercise1_groupByAndCollect("aaa") shouldBe false
+        Chapter1.Ben.exercise1_groupByAndCollect("zxcvbnmzxcvbnm") shouldBe false
+
+        Chapter1.Ben.exercise1_recursive("aaa") shouldBe false
+        Chapter1.Ben.exercise1_recursive("zxcvbnmzxcvbnm") shouldBe false
 
         Chapter1.Paul.exercise1_usingCollect("aaa") shouldBe false
         Chapter1.Paul.exercise1_usingCollect("zxcvbnmasdfghjklqwertyuiop") shouldBe true
