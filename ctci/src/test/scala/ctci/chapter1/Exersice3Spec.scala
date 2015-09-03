@@ -15,9 +15,6 @@ class Exersice3Spec extends FunSpec with Matchers {
 
          Ben.removeDuplicates_usingDistinct("abcdefab") shouldBe "abcdef"
          Ben.removeDuplicates_usingDistinct("aaaaaa") shouldBe "a"
-
-         Ben.removeDuplicates_usingReplaceAll("abcdefab") shouldBe "abcdef"
-         Ben.removeDuplicates_usingReplaceAll("aaaaaa") shouldBe "a"
        }
      }
    }
