@@ -4,7 +4,6 @@ import scala.annotation.tailrec
 
 object Exercise1 {
 
-
   object Paul {
 
     def exercise1_usingDistinct(input: String): Boolean =
@@ -22,11 +21,9 @@ object Exercise1 {
       }._2.isEmpty
 
     def exercise1_usingFoldLeftWithOneImmutableSet(input: String): Boolean =
-      input.foldLeft((Set.empty[Char])) { case (inputSet, currentChar) =>
-        inputSet + currentChar
-      }.size == input.length
+      input.foldLeft((Set.empty[Char])) { case (inputSet, currentChar) => inputSet + currentChar }.size == input.length
 
-    def exercise1_usingTailRecursion(input: String): Boolean = ???
+    def exercise1_usingNoAdditionalDataStructures(input: String): Boolean = ???
   }
 
   object Ben {
